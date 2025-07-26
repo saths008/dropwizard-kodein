@@ -3,7 +3,7 @@ package dev.saath.dropwizard.kodein.installers
 import io.dropwizard.core.setup.Environment
 import org.kodein.di.DI
 import org.kodein.di.direct
-import org.kodein.di.instance
+import org.kodein.di.instanceOrNull
 
 interface InstallerInterface {
     val scanResults: io.github.classgraph.ScanResult
@@ -17,9 +17,12 @@ interface InstallerInterface {
     ) {
         clazzes.forEach { clazz ->
             try {
-                di.direct.instance<Any>(clazz.kotlin)
-                environment.jersey().register(clazz)
+                val resource = di.direct.instanceOrNull<Any>(tag = clazz.name)
+                environment.jersey().register(resource!!)
             } catch (exception: Exception) {
+                println(
+                    "==========================================KodeinBundle==========================================",
+                )
                 println("Failed to register: ${clazz.simpleName}: ${exception.message}")
             }
         }

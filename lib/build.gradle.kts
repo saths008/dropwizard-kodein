@@ -38,6 +38,7 @@ dependencies {
     implementation(libs.dropwizard.core)
     implementation(libs.classgraph)
     implementation(libs.kodein)
+    testImplementation(libs.dropwizard.testing)
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

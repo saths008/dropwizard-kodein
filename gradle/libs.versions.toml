@@ -17,6 +17,7 @@ junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", vers
 dropwizard-core = { module = "io.dropwizard:dropwizard-core", version.ref = "dropwizard" }
 classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
 kodein = { module = "org.kodein.di:kodein-di", version.ref = "kodein" }
+dropwizard-testing = { module = "io.dropwizard:dropwizard-testing", version.ref = "dropwizard" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.1.20" }
