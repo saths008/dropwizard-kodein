@@ -29,5 +29,5 @@ class KodeinBundle : ConfiguredBundle<Configuration> {
     }
 
     @Throws(ClassGraphException::class)
-    fun searchClassPath(): ScanResult = ClassGraph().enableClassInfo().scan()
+    fun searchClassPath(): ScanResult = ClassGraph().enableClassInfo().enableAnnotationInfo().scan()
 }
