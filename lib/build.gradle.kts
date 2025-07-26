@@ -36,6 +36,8 @@ dependencies {
     implementation(libs.guava)
 
     implementation(libs.dropwizard.core)
+    implementation(libs.classgraph)
+    implementation(libs.kodein)
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

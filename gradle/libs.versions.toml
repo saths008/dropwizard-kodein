@@ -7,12 +7,16 @@ guava = "33.4.5-jre"
 junit-jupiter-engine = "5.12.1"
 dropwizard = "4.0.15"
 kotlinter = "5.1.1"
+classgraph = "4.8.181"
+kodein = "7.26.1"
 
 [libraries]
 commons-math3 = { module = "org.apache.commons:commons-math3", version.ref = "commons-math3" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter-engine" }
 dropwizard-core = { module = "io.dropwizard:dropwizard-core", version.ref = "dropwizard" }
+classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
+kodein = { module = "org.kodein.di:kodein-di", version.ref = "kodein" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.1.20" }
