@@ -1,7 +1,8 @@
 package dev.saath.dropwizard.kodein
 
 import dev.saath.dropwizard.kodein.installers.autoscanner.AutoScanInstallerInterface
-import dev.saath.dropwizard.kodein.installers.autoscanner.ResourceInstaller
+import dev.saath.dropwizard.kodein.installers.discanner.AllJerseyInstaller
+import dev.saath.dropwizard.kodein.installers.discanner.DIScanInstallerInterface
 import io.dropwizard.core.Configuration
 import io.dropwizard.core.ConfiguredBundle
 import io.dropwizard.core.setup.Bootstrap
@@ -13,25 +14,58 @@ import org.kodein.di.DI
 import kotlin.jvm.Throws
 
 class KodeinBundle(
-    diModules: List<DI.Module>,
+    val modules: List<KodeinDropwizardModuleInterface>,
+    val diScanInstallers: List<DIScanInstallerInterface> = listOf(AllJerseyInstaller()),
+    val autoScaninstallers: List<AutoScanInstallerInterface> = emptyList(),
+    val packageToSearch: List<String> = emptyList(),
 ) : ConfiguredBundle<Configuration> {
-    val di: DI =
-        DI {
-            diModules.forEach { import(it) }
-        }
-
     override fun initialize(bootstrap: Bootstrap<*>?) {}
 
     override fun run(
         configuration: Configuration?,
         environment: Environment?,
     ) {
-        val scanRes = searchClassPath()
-        listOf<AutoScanInstallerInterface>(ResourceInstaller()).forEach { installer ->
-            installer.install(di, environment!!, installer.search(scanRes))
+        configureModules(configuration!!)
+
+        // All modules now have Configuration available
+        val di = getDI()
+
+        val scanRes by lazy {
+            searchClassPath()
+        }
+
+        diScanInstallers.forEach {
+            val clazzes = it.search(di.container.tree.bindings)
+            it.install(di, environment!!, clazzes)
+        }
+
+        autoScaninstallers.forEach {
+            val clazzes = it.search(scanRes)
+            it.install(di, environment!!, clazzes)
         }
     }
 
     @Throws(ClassGraphException::class)
-    fun searchClassPath(): ScanResult = ClassGraph().enableClassInfo().enableAnnotationInfo().scan()
+    fun searchClassPath(): ScanResult =
+        ClassGraph()
+            .acceptPackages(*packageToSearch.toTypedArray())
+            .enableClassInfo()
+            .enableAnnotationInfo()
+            .scan()
+
+    fun configureModules(configuration: Configuration) {
+        modules.forEach {
+            when (it) {
+                is ConfigurationAwareModuleInterface -> it.setConfiguration(configuration)
+            }
+        }
+    }
+
+    fun getDI(): DI {
+        val di =
+            DI {
+                modules.forEach { import(it.configure()) }
+            }
+        return di
+    }
 }

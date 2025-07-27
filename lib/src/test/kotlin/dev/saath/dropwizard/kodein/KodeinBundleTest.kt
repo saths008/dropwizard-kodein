@@ -3,11 +3,121 @@
  */
 package dev.saath.dropwizard.kodein
 
+import dev.saath.dropwizard.kodein.resources.NotFoundExceptionMapper
+import dev.saath.dropwizard.kodein.resources.PoweredByResponseFilter
+import dev.saath.dropwizard.kodein.resources.TestResource
+import io.dropwizard.core.Application
+import io.dropwizard.core.Configuration
+import io.dropwizard.core.setup.Bootstrap
+import io.dropwizard.core.setup.Environment
+import io.dropwizard.testing.junit5.DropwizardAppExtension
+import io.dropwizard.testing.junit5.DropwizardExtensionsSupport
+import jakarta.ws.rs.GET
+import jakarta.ws.rs.Path
+import jakarta.ws.rs.Produces
+import jakarta.ws.rs.client.Client
+import jakarta.ws.rs.core.MediaType
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.extension.ExtendWith
+import org.kodein.di.DI
+import org.kodein.di.DI.Companion.invoke
+import org.kodein.di.bindSingleton
 import kotlin.test.Test
-import kotlin.test.assertTrue
 
+@ExtendWith(DropwizardExtensionsSupport::class)
 class KodeinBundleTest {
-    @Test fun someLibraryMethodReturnsTrue() {
-        assertTrue(3 == 3, "someLibraryMethod should return 'true'")
+    companion object {
+        val app: DropwizardAppExtension<KodeinTestConfiguration> =
+            DropwizardAppExtension(
+                KodeinBundleTestApplication::class.java,
+                KodeinTestConfiguration(),
+            )
     }
+
+    @Test
+    fun `not found exception mapper was correctly installed with jersey`() {
+        val client: Client = app.client()
+        val baseUrl = "http://localhost:${app.localPort}"
+
+        val testResponse = client.target("$baseUrl/test/hello").request().get()
+
+        assertEquals(404, testResponse.status, "Response status was not correct after registering the exception mapper")
+        assertEquals(
+            NotFoundExceptionMapper.MESSAGE,
+            testResponse.readEntity(String::class.java),
+            "Response message was not correct after registering the exception mapper",
+        )
+        testResponse.close()
+    }
+
+    @Test
+    fun `resources have access to configuration and filters are registered correctly`() {
+        val client: Client = app.client()
+        val baseUrl = "http://localhost:${app.localPort}"
+
+        val testResponse = client.target("$baseUrl/another/database-name").request().get()
+
+        assertEquals(
+            listOf(PoweredByResponseFilter.POWERED_BY_HEADER_VAL),
+            testResponse.headers[PoweredByResponseFilter.POWERED_BY_HEADER_KEY],
+            "PoweredByResponseFilter did not set correct powered by header",
+        )
+
+        assertEquals(
+            KodeinTestConfiguration.DATABASE_NAME,
+            testResponse.readEntity(String::class.java),
+            "Resource correctly returned configuration value in response",
+        )
+
+        testResponse.close()
+    }
+}
+
+class TestApplicationModule :
+    ConfigurationAwareModuleInterface,
+    KodeinDropwizardModuleInterface {
+    private lateinit var config: KodeinTestConfiguration
+
+    override fun setConfiguration(configuration: Configuration) {
+        this.config = (configuration as KodeinTestConfiguration)
+    }
+
+    override fun configure(): DI.Module =
+        DI.Module("Test Application Module") {
+            bindSingleton<NotFoundExceptionMapper>(tag = NotFoundExceptionMapper::class.java.name) { NotFoundExceptionMapper() }
+            bindSingleton<TestResource>(tag = TestResource::class.java.name) { TestResource() }
+            bindSingleton<PoweredByResponseFilter>(tag = PoweredByResponseFilter::class.java.name) { PoweredByResponseFilter() }
+            bindSingleton<AnotherResourceWithConfiguration>(tag = AnotherResourceWithConfiguration::class.java.name) {
+                AnotherResourceWithConfiguration(config.databaseName)
+            }
+        }
+}
+
+class KodeinTestConfiguration : Configuration() {
+    companion object {
+        const val DATABASE_NAME = "test-db"
+    }
+
+    val databaseName: String = DATABASE_NAME
+}
+
+class KodeinBundleTestApplication : Application<KodeinTestConfiguration>() {
+    override fun initialize(bootstrap: Bootstrap<KodeinTestConfiguration>) {
+        bootstrap.addBundle(KodeinBundle(listOf(TestApplicationModule())))
+    }
+
+    override fun run(
+        configuration: KodeinTestConfiguration,
+        environment: Environment,
+    ) {}
+}
+
+@Path("/another")
+@Produces(MediaType.TEXT_PLAIN)
+class AnotherResourceWithConfiguration(
+    val databaseName: String,
+) {
+    @Path("/database-name")
+    @GET
+    fun databaseName() = databaseName
 }
