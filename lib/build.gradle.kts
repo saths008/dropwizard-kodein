@@ -16,7 +16,7 @@ plugins {
 
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
-    id("com.vanniktech.maven.publish") version "0.30.0"
+    id("com.vanniktech.maven.publish") version "0.34.0"
 }
 
 repositories {
@@ -54,8 +54,9 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 }
 
+
 mavenPublishing {
-    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
+    publishToMavenCentral(automaticRelease = true)
 
     signAllPublications()
 
