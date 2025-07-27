@@ -13,6 +13,7 @@ plugins {
 
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
+    `maven-publish`
 }
 
 repositories {
@@ -51,4 +52,17 @@ java {
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/saths008/dropwizard-kodein")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
