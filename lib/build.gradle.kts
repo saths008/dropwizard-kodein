@@ -16,7 +16,7 @@ plugins {
 
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
-    `maven-publish`
+    id("com.vanniktech.maven.publish") version "0.30.0"
 }
 
 repositories {
@@ -54,16 +54,36 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 }
 
-publishing {
-    publications { create<MavenPublication>("mavenJava") { from(components["java"]) } }
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/saths008/dropwizard-kodein")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+mavenPublishing {
+    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
+
+    signAllPublications()
+
+    coordinates(group.toString(), "dropwizard-kodein", version.toString())
+
+    pom {
+        name = "dropwizard-kodein"
+        description = "A simple library for dropwizard kodein integration"
+        inceptionYear = "2025"
+        url = "https://github.com/saths008/dropwizard-kodein"
+        licenses {
+            license {
+                name = "The Apache License, Version 2.0"
+                url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                distribution = "https://www.apache.org/licenses/LICENSE-2.0.txt"
             }
+        }
+        developers {
+            developer {
+                id = "saths008"
+                name = "Saath Satheeshkumar"
+                url = "https://github.com/saths008"
+            }
+        }
+        scm {
+            url = "https://github.com/saths008/dropwizard-kodein/"
+            connection = "scm:git:git://github.com/saths008/dropwizard-kodein.git"
+            developerConnection = "scm:git:ssh://git@github.com/saths008/dropwizard-kodein.git"
         }
     }
 }
