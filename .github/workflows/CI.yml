@@ -51,7 +51,7 @@ jobs:
 
       - name: Publish to GitHub Packages
         if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' && !contains(steps.check_label.outputs.result, 'internal') }}
-        run: ./gradlew publish --no-daemon
+        run: ./gradlew publish --no-daemon --rerun-tasks
         env:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
