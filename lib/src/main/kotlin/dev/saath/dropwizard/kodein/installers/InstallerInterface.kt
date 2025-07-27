@@ -1,30 +1,35 @@
 package dev.saath.dropwizard.kodein.installers
 
 import io.dropwizard.core.setup.Environment
+import io.github.classgraph.ScanResult
+import org.kodein.di.BindingsMap
 import org.kodein.di.DI
 import org.kodein.di.direct
+import org.kodein.di.instance
 import org.kodein.di.instanceOrNull
 
 interface InstallerInterface {
-    val scanResults: io.github.classgraph.ScanResult
-
-    fun search(): List<Class<*>>
-
     fun install(
         di: DI,
         environment: Environment,
         clazzes: List<Class<*>>,
     ) {
         clazzes.forEach { clazz ->
-            try {
-                val resource = di.direct.instanceOrNull<Any>(tag = clazz.name)
-                environment.jersey().register(resource!!)
-            } catch (exception: Exception) {
-                println(
-                    "==========================================KodeinBundle==========================================",
-                )
-                println("Failed to register: ${clazz.simpleName}: ${exception.message}")
-            }
+            val resource = di.direct.instance<Any>(tag = clazz.name)
+            println("resource name: ${resource::class.simpleName}")
+            environment.jersey().register(resource)
         }
     }
+}
+
+interface AutoScanInstallerInterface : InstallerInterface {
+    fun search(scanResults: ScanResult): List<Class<*>>
+}
+
+/**
+ * DIScanInstallerInterface represents installers that look through
+ * Kodein's container tree to install dependecies
+ */
+interface DIScanInstallerInterface : InstallerInterface {
+    fun search(bindings: BindingsMap): List<Class<*>>
 }

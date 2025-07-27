@@ -8,7 +8,6 @@ import kotlin.test.assertTrue
 
 class KodeinBundleTest {
     @Test fun someLibraryMethodReturnsTrue() {
-        val classUnderTest = KodeinBundle()
         assertTrue(3 == 3, "someLibraryMethod should return 'true'")
     }
 }

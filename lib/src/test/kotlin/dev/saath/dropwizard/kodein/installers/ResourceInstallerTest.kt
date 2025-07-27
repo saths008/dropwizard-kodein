@@ -1,13 +1,15 @@
 package dev.saath.dropwizard.kodein.installers
 
+import dev.saath.dropwizard.kodein.installers.ResourceInstallerTest.Companion.scanResults
+import dev.saath.dropwizard.kodein.resources.AnotherResource
 import dev.saath.dropwizard.kodein.resources.BlahResource
+import dev.saath.dropwizard.kodein.resources.TestResource
 import io.dropwizard.core.Application
 import io.dropwizard.core.Configuration
 import io.dropwizard.core.setup.Environment
 import io.dropwizard.testing.junit5.DropwizardAppExtension
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport
 import io.github.classgraph.ClassGraph
-import io.github.classgraph.ScanResult
 import jakarta.ws.rs.client.Client
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.extension.ExtendWith
@@ -23,19 +25,19 @@ class ResourceInstallerTest {
                 TestApplication::class.java,
                 TestConfiguration(),
             )
-    }
 
-    val scanResults =
-        ClassGraph()
-            .enableClassInfo()
-            .enableAnnotationInfo()
-            .acceptPackages("dev.saath.dropwizard.kodein.resources")
-            .scan()
+        val scanResults =
+            ClassGraph()
+                .enableClassInfo()
+                .enableAnnotationInfo()
+                .acceptPackages("dev.saath.dropwizard.kodein.resources")
+                .scan()
+    }
 
     @Test
     fun `test scan finds all resources`() {
         scanResults.allClasses.forEach { println(it) }
-        val classesWithPath = ResourceInstaller(scanResults).search()
+        val classesWithPath = ResourceInstaller().search(scanResults)
         assertEquals(3, classesWithPath.size, "Resources with @Path were not all found")
     }
 
@@ -59,20 +61,15 @@ class TestApplication : Application<TestConfiguration>() {
         val di =
             DI {
                 bindSingleton<BlahResource>(tag = BlahResource::class.java.name) { BlahResource() }
+                bindSingleton<AnotherResource>(tag = AnotherResource::class.java.name) { AnotherResource() }
+                bindSingleton<TestResource>(tag = TestResource::class.java.name) { TestResource() }
             }
 
         // Would actually be done by the KodeinModule, this is just for this test
-        val installer = TestInstaller()
-        val clazzes = installer.search()
+        val installer = ResourceInstaller()
+        val clazzes = installer.search(scanResults)
         installer.install(di, environment, clazzes)
     }
 }
 
 class TestConfiguration : Configuration()
-
-class TestInstaller : InstallerInterface {
-    override val scanResults: ScanResult
-        get() = throw NotImplementedError("Not needed for this test")
-
-    override fun search(): List<Class<*>> = listOf(BlahResource::class.java)
-}

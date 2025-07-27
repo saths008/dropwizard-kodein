@@ -7,8 +7,7 @@ import io.github.classgraph.ScanResult
  */
 const val JAX_RS_PATH_ANNOTATION = "jakarta.ws.rs.Path"
 
-class ResourceInstaller(
-    override val scanResults: ScanResult,
-) : InstallerInterface {
-    override fun search(): List<Class<*>> = scanResults.getClassesWithAnnotation(JAX_RS_PATH_ANNOTATION).loadClasses()
+class ResourceInstaller : AutoScanInstallerInterface {
+    override fun search(scanResults: ScanResult): List<Class<*>> =
+        scanResults.getClassesWithAnnotation(JAX_RS_PATH_ANNOTATION).loadClasses()
 }
