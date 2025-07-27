@@ -11,7 +11,7 @@ class ExceptionMapperInstaller : DIScanInstallerInterface {
             .mapNotNull { (key, _) -> key.isExceptionMapper() }
 }
 
-private fun DI.Key<*, *, *>.isExceptionMapper(): Class<*>? {
+fun DI.Key<*, *, *>.isExceptionMapper(): Class<*>? {
     val rawClass = this.type.jvmType as? Class<*>
 
     if (rawClass == null ||
