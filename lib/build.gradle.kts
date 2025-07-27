@@ -5,8 +5,8 @@
  * For more details on building Java & JVM projects, please refer to https://docs.gradle.org/8.14/userguide/building_java_projects.html in the Gradle documentation.
  */
 
-group="dev.saath.dropwizard.kodein"
-version="0.0.1"
+group = "io.github.saths008"
+version = "0.0.1"
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
@@ -36,7 +36,8 @@ dependencies {
     // This dependency is exported to consumers, that is to say found on their compile classpath.
     api(libs.commons.math3)
 
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
+    // This dependency is used internally, and not exposed to consumers on their own compile
+    // classpath.
     implementation(libs.guava)
 
     implementation(libs.dropwizard.core)
@@ -46,11 +47,7 @@ dependencies {
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
+java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
 
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
@@ -58,11 +55,7 @@ tasks.named<Test>("test") {
 }
 
 publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-        }
-    }
+    publications { create<MavenPublication>("mavenJava") { from(components["java"]) } }
     repositories {
         maven {
             name = "GitHubPackages"
