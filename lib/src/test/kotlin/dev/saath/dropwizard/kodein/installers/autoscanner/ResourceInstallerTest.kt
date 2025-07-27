@@ -1,6 +1,7 @@
-package dev.saath.dropwizard.kodein.installers
+package dev.saath.dropwizard.kodein.installers.autoscanner
 
-import dev.saath.dropwizard.kodein.installers.ResourceInstallerTest.Companion.scanResults
+import dev.saath.dropwizard.kodein.installers.autoscanner.ResourceInstaller
+import dev.saath.dropwizard.kodein.installers.autoscanner.ResourceInstallerTest.Companion.scanResults
 import dev.saath.dropwizard.kodein.resources.AnotherResource
 import dev.saath.dropwizard.kodein.resources.BlahResource
 import dev.saath.dropwizard.kodein.resources.TestResource
@@ -53,7 +54,7 @@ class ResourceInstallerTest {
     }
 }
 
-class TestApplication : Application<TestConfiguration>() {
+class TestApplication : io.dropwizard.core.Application<TestConfiguration>() {
     override fun run(
         configuration: TestConfiguration,
         environment: Environment,
@@ -72,4 +73,4 @@ class TestApplication : Application<TestConfiguration>() {
     }
 }
 
-class TestConfiguration : Configuration()
+class TestConfiguration : io.dropwizard.core.Configuration()

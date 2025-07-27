@@ -1,7 +1,7 @@
 package dev.saath.dropwizard.kodein
 
-import dev.saath.dropwizard.kodein.installers.AutoScanInstallerInterface
-import dev.saath.dropwizard.kodein.installers.ResourceInstaller
+import dev.saath.dropwizard.kodein.installers.autoscanner.AutoScanInstallerInterface
+import dev.saath.dropwizard.kodein.installers.autoscanner.ResourceInstaller
 import io.dropwizard.core.Configuration
 import io.dropwizard.core.ConfiguredBundle
 import io.dropwizard.core.setup.Bootstrap

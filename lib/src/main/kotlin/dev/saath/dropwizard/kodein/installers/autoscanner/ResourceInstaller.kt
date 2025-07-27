@@ -1,4 +1,4 @@
-package dev.saath.dropwizard.kodein.installers
+package dev.saath.dropwizard.kodein.installers.autoscanner
 
 import io.github.classgraph.ScanResult
 
