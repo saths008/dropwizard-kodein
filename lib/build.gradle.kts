@@ -13,6 +13,7 @@ plugins {
 
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
+    `maven-publish`
 }
 
 repositories {
@@ -36,6 +37,9 @@ dependencies {
     implementation(libs.guava)
 
     implementation(libs.dropwizard.core)
+    implementation(libs.classgraph)
+    implementation(libs.kodein)
+    testImplementation(libs.dropwizard.testing)
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -48,4 +52,17 @@ java {
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/saths008/dropwizard-kodein")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
