@@ -6,7 +6,7 @@
  */
 
 group = "io.github.saths008"
-version = "0.0.1"
+version = "0.0.2"
 
 plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
@@ -47,7 +47,7 @@ dependencies {
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
-java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
+java { toolchain { languageVersion = JavaLanguageVersion.of(17) } }
 
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
